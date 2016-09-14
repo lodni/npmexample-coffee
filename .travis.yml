@@ -1,19 +1,51 @@
+language: node_js
+node_js:
+  - "6"
+  - "5"
+  - "node"
+
+compiler: gcc
+sudo: false
+
 os:
   - linux
   - osx
-sudo: false
-language: node_js
+
 matrix:
-  include:
-    - node_js: "node"
-    - node_js: "0.10"
-    - node_js: "0.12"
-    - node_js: "4"
-    - node_js: "5"
-    - node_js: "6"
   fast_finish: true
-before_script:
-- git submodule update --init --recursive
-branches:
-  only:
-    - master
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
+
+before_install:
+  - git submodule update --init --recursive
+  - npm config set python `which python`
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then
+      export CC="gcc-4.8";
+      export CXX="g++-4.8";
+      export LINK="gcc-4.8";
+      export LINKXX="g++-4.8";
+    fi
+  - nvm --version
+  - node --version
+  - npm --version
+  - gcc --version
+  - g++ --version
+
+script:
+  - npm install
+  - if [ $TRAVIS_OS_NAME == "linux" ] && [ $TRAVIS_NODE_VERSION == "4" ]; then
+      npm run lint || exit 1;
+    fi
+  - npm test
+
+cache:
+  directories:
+    - $HOME/.node-gyp
+    - $HOME/.npm
+    - node_modules
