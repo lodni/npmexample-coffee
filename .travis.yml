@@ -1,4 +1,19 @@
+os:
+  - linux
+  - osx
+sudo: false
 language: node_js
-node_js:
-    - "node"
-    - "6"
+matrix:
+  include:
+    - node_js: "node"
+    - node_js: "0.10"
+    - node_js: "0.12"
+    - node_js: "4"
+    - node_js: "5"
+    - node_js: "6"
+  fast_finish: true
+before_script:
+- git submodule update --init --recursive
+branches:
+  only:
+    - master
